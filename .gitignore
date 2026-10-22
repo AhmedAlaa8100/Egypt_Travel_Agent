@@ -1,0 +1,34 @@
+
+# Secrets
+.env
+.env.*
+
+# Keep the example configuration
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Generated application data
+data/chroma/
+data/processed/
+eval/reports/*
+
+# Keep the reports directory
+!eval/reports/.gitkeep
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
