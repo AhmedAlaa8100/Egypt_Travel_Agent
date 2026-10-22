@@ -3,6 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests.test_preference_tools import preferences
 from travel_agent.tools.registry import create_tools
 
 
@@ -14,14 +15,16 @@ def setup_tools():
     return preferences, tools_by_name
 
 
-def test_creates_four_langchain_tools(setup_tools):
-    _, tools = setup_tools
+def test_creates_five_langchain_tools():
+    # Keep your existing preferences setup.
+    tools = create_tools(preferences)
 
-    assert set(tools) == {
+    assert {tool.name for tool in tools} == {
         "estimate_trip_cost",
         "convert_currency",
         "save_preference",
         "recall_preferences",
+        "search_knowledge_base",
     }
 
 

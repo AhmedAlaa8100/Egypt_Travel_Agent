@@ -3,6 +3,7 @@
 
 from langchain_core.tools import BaseTool, tool
 
+from travel_agent.rag.store import KnowledgeBase
 from travel_agent.tools.preference_tools import PreferenceTools
 from travel_agent.tools.travel_tools import (
     convert_currency as convert_currency_impl,
@@ -10,14 +11,14 @@ from travel_agent.tools.travel_tools import (
 )
 
 
-def create_tools(preferences: PreferenceTools) -> list[BaseTool]:
-    """Create the tools, injecting the preference memory dependency."""
-
+def create_tools(
+    preferences: PreferenceTools,
+    knowledge_base: KnowledgeBase | None = None,
+) -> list[BaseTool]:
+    knowledge_base = knowledge_base or KnowledgeBase()
     @tool
     def estimate_trip_cost(
-        destination: str,
-        nights: int,
-        travellers: int = 1,
+        destination: str, nights: int, travellers: int = 1
     ) -> dict:
         """Estimate accommodation costs in EGP for an Egyptian destination."""
         return estimate_trip_cost_impl(
@@ -28,11 +29,9 @@ def create_tools(preferences: PreferenceTools) -> list[BaseTool]:
 
     @tool
     def convert_currency(
-        amount: float,
-        from_currency: str,
-        to_currency: str,
+        amount: float, from_currency: str, to_currency: str
     ) -> dict:
-        """Convert an amount between EGP, USD, and EUR using configured prototype rates."""
+        """Convert an amount between EGP, USD, and EUR using prototype rates."""
         return convert_currency_impl(
             amount=amount,
             from_currency=from_currency,
@@ -46,12 +45,18 @@ def create_tools(preferences: PreferenceTools) -> list[BaseTool]:
 
     @tool
     def recall_preferences(query: str) -> dict:
-        """Retrieve previously saved traveller preferences relevant to a query."""
+        """Retrieve personal preferences relevant to a query."""
         return preferences.recall_preferences(query)
+
+    @tool
+    def search_knowledge_base(query: str) -> dict:
+        """Search travel documents for destination advice and travel facts."""
+        return {"documents": knowledge_base.search(query, top_k=3)}
 
     return [
         estimate_trip_cost,
         convert_currency,
         save_preference,
         recall_preferences,
+        search_knowledge_base,
     ]
