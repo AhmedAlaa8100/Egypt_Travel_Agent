@@ -1,6 +1,8 @@
 
 """Travel-related tools used by the travel agent."""
 
+import re
+
 # Prototype rates, expressed in EGP per room per night.
 NIGHTLY_RATE_EGP = {
     "aswan": 2500,
@@ -18,9 +20,19 @@ FX_TO_EGP = {
 }
 
 
+def _normalise_destination(destination) -> str:
+    """Turn names such as 'Alexandria, Egypt' into a supported city key."""
+    text = str(destination).strip().lower()
+    text = re.sub(r"\s+", " ", text)
+    text = text.split(",")[0].strip()
+    if text.endswith(" egypt"):
+        text = text[: -len(" egypt")].strip()
+    return text
+
+
 def estimate_trip_cost(destination, nights, travellers=1):
     """Estimate hotel cost in EGP for a stay in an Egyptian city."""
-    dest = str(destination).strip().lower()
+    dest = _normalise_destination(destination)
 
     if dest not in NIGHTLY_RATE_EGP:
         raise ValueError(

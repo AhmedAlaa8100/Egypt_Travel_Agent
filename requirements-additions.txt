@@ -1,0 +1,3 @@
+# Add these lines to the existing requirements.txt; keep your pinned dependencies.
+fastapi
+uvicorn[standard]
